@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
@@ -14,9 +15,19 @@ export default async function ProtectedLayout({ children }: { children: React.Re
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-white/10 bg-black/40 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-neon-blue">PassVault QR</p>
-            <p className="text-xs text-white/60">Secure credential lifecycle</p>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/PassVault.png"
+              alt="PassVault logo"
+              width={120}
+              height={120}
+              className="h-30 w-30 shrink-0 drop-shadow-[0_0_16px_rgba(76,195,255,0.6)]"
+              priority
+            />
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-neon-blue">PassVault QR</p>
+              <p className="text-xs text-white/60">Secure credential lifecycle</p>
+            </div>
           </div>
           <nav className="flex items-center gap-4 text-sm">
             <Link href="/dashboard" className="text-white/80 hover:text-white">

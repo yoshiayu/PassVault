@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -5,7 +6,17 @@ export default function HomePage() {
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 py-16">
       <section className="glass-panel p-10">
         <div className="flex flex-col gap-6">
-          <span className="glass-chip">PassVault QR</span>
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="glass-chip">PassVault QR</span>
+            <Image
+              src="/PassVault%20(1).png"
+              alt="PassVault"
+              width={220}
+              height={64}
+              className="h-10 w-auto drop-shadow-[0_0_12px_rgba(125,231,255,0.65)]"
+              priority
+            />
+          </div>
           <h1 className="text-4xl font-semibold leading-tight text-white">
             Secure, consistent credential lifecycle with QR handoff.
           </h1>

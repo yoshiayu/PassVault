@@ -1,8 +1,5 @@
 {
   "/(public)/page": "app/(public)/page.js",
   "/api/credentials/route": "app/api/credentials/route.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/(public)/signin/page": "app/(public)/signin/page.js",
-  "/(protected)/items/page": "app/(protected)/items/page.js",
   "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js"
 }
