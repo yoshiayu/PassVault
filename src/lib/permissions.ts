@@ -1,19 +1,27 @@
 import type { Session } from "next-auth";
+import type { Prisma } from "@prisma/client";
+import type { ActiveScope } from "@/lib/scope";
 
 export function isAdmin(session: Session): boolean {
   return session.user.role === "ADMIN";
 }
 
-export function credentialWhereForSession(session: Session) {
+export function systemWhereForScope(session: Session, scope: ActiveScope): Prisma.SystemWhereInput {
   if (isAdmin(session)) {
     return {};
   }
-  return { createdById: session.user.id };
+
+  if (scope.type === "organization") {
+    return { scopeType: "ORGANIZATION", organizationId: scope.organizationId };
+  }
+
+  return { scopeType: "PERSONAL", ownerId: session.user.id };
 }
 
-export function systemWhereForSession(session: Session) {
+export function credentialWhereForScope(session: Session, scope: ActiveScope): Prisma.CredentialWhereInput {
   if (isAdmin(session)) {
     return {};
   }
-  return { ownerId: session.user.id };
+
+  return { system: systemWhereForScope(session, scope) };
 }

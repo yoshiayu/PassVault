@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { systemSchema } from "@/lib/validators";
 import { writeAuditLog } from "@/lib/audit";
+import { getActiveScope } from "@/lib/scope";
 
 export async function createSystem(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -25,11 +26,15 @@ export async function createSystem(formData: FormData) {
     throw new Error("Invalid system payload");
   }
 
+  const scope = await getActiveScope(session);
+
   const system = await prisma.system.create({
     data: {
       ...parsed.data,
       tags: parsed.data.tags ?? [],
-      ownerId: session.user.id
+      ownerId: session.user.id,
+      scopeType: scope.type === "organization" ? "ORGANIZATION" : "PERSONAL",
+      organizationId: scope.type === "organization" ? scope.organizationId : null
     }
   });
 

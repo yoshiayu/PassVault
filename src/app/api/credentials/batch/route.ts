@@ -7,16 +7,24 @@ import { error, ok } from "@/lib/api-response";
 import { generatePassword } from "@/lib/password";
 import { encryptSecret, hashSecret } from "@/lib/crypto";
 import { writeAuditLog } from "@/lib/audit";
+import { getActiveScope } from "@/lib/scope";
+import { systemWhereForScope } from "@/lib/permissions";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return error("UNAUTHORIZED", "Login required", 401);
 
+  const scope = await getActiveScope(session);
   const body = await request.json();
   const parsed = batchSchema.safeParse(body);
   if (!parsed.success) {
     return error("VALIDATION_ERROR", "Invalid batch payload", 400, parsed.error.flatten());
   }
+
+  const system = await prisma.system.findFirst({
+    where: { id: parsed.data.systemId, ...systemWhereForScope(session, scope) }
+  });
+  if (!system) return error("NOT_FOUND", "System not found", 404);
 
   const start = new Date(parsed.data.startDate);
   const end = new Date(parsed.data.endDate);

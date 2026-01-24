@@ -12,6 +12,16 @@ enum Role {
   USER
 }
 
+enum ScopeType {
+  PERSONAL
+  ORGANIZATION
+}
+
+enum MembershipRole {
+  OWNER
+  MEMBER
+}
+
 model User {
   id            String       @id @default(cuid())
   name          String?
@@ -24,6 +34,9 @@ model User {
   systems       System[]
   credentials   Credential[] @relation("CreatedCredentials")
   auditLogs     AuditLog[]
+  memberships   Membership[]
+  activeOrganizationId String?
+  activeOrganization   Organization? @relation("ActiveOrganization", fields: [activeOrganizationId], references: [id])
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 }
@@ -69,8 +82,11 @@ model System {
   name        String
   description String?
   tags        String[]
+  scopeType   ScopeType     @default(PERSONAL)
   ownerId     String
   owner       User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   credentials Credential[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -112,4 +128,26 @@ model AuditLog {
   entityType String
   entityId   String
   createdAt  DateTime @default(now())
+}
+
+model Organization {
+  id          String       @id @default(cuid())
+  name        String
+  memberships Membership[]
+  systems     System[]
+  activeUsers User[]       @relation("ActiveOrganization")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Membership {
+  id             String        @id @default(cuid())
+  userId         String
+  organizationId String
+  role           MembershipRole @default(MEMBER)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime      @default(now())
+
+  @@unique([userId, organizationId])
 }

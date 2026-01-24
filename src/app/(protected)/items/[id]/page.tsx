@@ -4,14 +4,16 @@ import CredentialSecret from "@/components/credential-secret";
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { credentialWhereForSession } from "@/lib/permissions";
+import { credentialWhereForScope } from "@/lib/permissions";
+import { getActiveScope } from "@/lib/scope";
 
 export default async function CredentialDetailPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session) return null;
 
+  const scope = await getActiveScope(session);
   const credential = await prisma.credential.findFirst({
-    where: { id: params.id, ...credentialWhereForSession(session) },
+    where: { id: params.id, ...credentialWhereForScope(session, scope) },
     include: { system: true }
   });
 

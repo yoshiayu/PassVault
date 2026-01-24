@@ -4,8 +4,9 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { systemSchema } from "@/lib/validators";
 import { error, ok } from "@/lib/api-response";
-import { systemWhereForSession } from "@/lib/permissions";
+import { systemWhereForScope } from "@/lib/permissions";
 import { writeAuditLog } from "@/lib/audit";
+import { getActiveScope } from "@/lib/scope";
 
 type Params = { params: { id: string } };
 
@@ -13,8 +14,9 @@ export async function GET(_request: NextRequest, { params }: Params) {
   const session = await getServerSession(authOptions);
   if (!session) return error("UNAUTHORIZED", "Login required", 401);
 
+  const scope = await getActiveScope(session);
   const system = await prisma.system.findFirst({
-    where: { id: params.id, ...systemWhereForSession(session) },
+    where: { id: params.id, ...systemWhereForScope(session, scope) },
     include: { credentials: true }
   });
 
@@ -27,8 +29,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
   const session = await getServerSession(authOptions);
   if (!session) return error("UNAUTHORIZED", "Login required", 401);
 
+  const scope = await getActiveScope(session);
   const existing = await prisma.system.findFirst({
-    where: { id: params.id, ...systemWhereForSession(session) }
+    where: { id: params.id, ...systemWhereForScope(session, scope) }
   });
   if (!existing) return error("NOT_FOUND", "System not found", 404);
 
@@ -52,8 +55,9 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   const session = await getServerSession(authOptions);
   if (!session) return error("UNAUTHORIZED", "Login required", 401);
 
+  const scope = await getActiveScope(session);
   const existing = await prisma.system.findFirst({
-    where: { id: params.id, ...systemWhereForSession(session) }
+    where: { id: params.id, ...systemWhereForScope(session, scope) }
   });
   if (!existing) return error("NOT_FOUND", "System not found", 404);
 

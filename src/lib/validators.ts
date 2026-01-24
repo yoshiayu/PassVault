@@ -6,6 +6,10 @@ export const systemSchema = z.object({
   tags: z.array(z.string().max(40)).optional().default([])
 });
 
+export const organizationSchema = z.object({
+  name: z.string().min(1).max(120)
+});
+
 export const credentialSchema = z.object({
   systemId: z.string().cuid(),
   label: z.string().min(1).max(120),

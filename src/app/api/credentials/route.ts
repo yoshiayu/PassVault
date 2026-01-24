@@ -4,10 +4,11 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { credentialSchema } from "@/lib/validators";
 import { error, ok } from "@/lib/api-response";
-import { credentialWhereForSession } from "@/lib/permissions";
+import { credentialWhereForScope, systemWhereForScope } from "@/lib/permissions";
 import { encryptSecret, hashSecret } from "@/lib/crypto";
 import { generatePassword } from "@/lib/password";
 import { writeAuditLog } from "@/lib/audit";
+import { getActiveScope } from "@/lib/scope";
 
 function allowManualSecret(): boolean {
   return (process.env.ALLOW_MANUAL_SECRET ?? "false").toLowerCase() === "true";
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return error("UNAUTHORIZED", "Login required", 401);
 
+  const scope = await getActiveScope(session);
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q") ?? "";
   const systemId = searchParams.get("systemId");
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
 
   const now = new Date();
   const where = {
-    ...credentialWhereForSession(session),
+    ...credentialWhereForScope(session, scope),
     ...(systemId ? { systemId } : {}),
     ...(tag ? { tags: { has: tag } } : {}),
     ...(query
@@ -65,6 +67,7 @@ export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return error("UNAUTHORIZED", "Login required", 401);
 
+  const scope = await getActiveScope(session);
   const body = await request.json();
   const parsed = credentialSchema.safeParse(body);
   if (!parsed.success) {
@@ -87,6 +90,14 @@ export async function POST(request: NextRequest) {
 
   if (!secret) {
     return error("VALIDATION_ERROR", "Secret is required", 400);
+  }
+
+  const system = await prisma.system.findFirst({
+    where: { id: parsed.data.systemId, ...systemWhereForScope(session, scope) }
+  });
+
+  if (!system) {
+    return error("NOT_FOUND", "System not found", 404);
   }
 
   const encryptedSecret = encryptSecret(secret);

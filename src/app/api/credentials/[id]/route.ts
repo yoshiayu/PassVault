@@ -4,10 +4,11 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { credentialSchema, credentialUpdateSchema } from "@/lib/validators";
 import { error, ok } from "@/lib/api-response";
-import { credentialWhereForSession } from "@/lib/permissions";
+import { credentialWhereForScope, systemWhereForScope } from "@/lib/permissions";
 import { encryptSecret, hashSecret } from "@/lib/crypto";
 import { generatePassword } from "@/lib/password";
 import { writeAuditLog } from "@/lib/audit";
+import { getActiveScope } from "@/lib/scope";
 
 type Params = { params: { id: string } };
 
@@ -19,8 +20,9 @@ export async function GET(_request: NextRequest, { params }: Params) {
   const session = await getServerSession(authOptions);
   if (!session) return error("UNAUTHORIZED", "Login required", 401);
 
+  const scope = await getActiveScope(session);
   const credential = await prisma.credential.findFirst({
-    where: { id: params.id, ...credentialWhereForSession(session) },
+    where: { id: params.id, ...credentialWhereForScope(session, scope) },
     include: { system: true }
   });
 
@@ -33,8 +35,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
   const session = await getServerSession(authOptions);
   if (!session) return error("UNAUTHORIZED", "Login required", 401);
 
+  const scope = await getActiveScope(session);
   const existing = await prisma.credential.findFirst({
-    where: { id: params.id, ...credentialWhereForSession(session) }
+    where: { id: params.id, ...credentialWhereForScope(session, scope) }
   });
   if (!existing) return error("NOT_FOUND", "Credential not found", 404);
 
@@ -47,6 +50,14 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     if (parsed.data.mode === "manual" && !allowManualSecret()) {
       return error("FORBIDDEN", "Manual secrets disabled", 403);
+    }
+
+    const system = await prisma.system.findFirst({
+      where: { id: parsed.data.systemId, ...systemWhereForScope(session, scope) }
+    });
+
+    if (!system) {
+      return error("NOT_FOUND", "System not found", 404);
     }
 
     const secret =
@@ -85,6 +96,15 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return error("VALIDATION_ERROR", "Invalid credential payload", 400, parsed.error.flatten());
   }
 
+  if (parsed.data.systemId && parsed.data.systemId !== existing.systemId) {
+    const system = await prisma.system.findFirst({
+      where: { id: parsed.data.systemId, ...systemWhereForScope(session, scope) }
+    });
+    if (!system) {
+      return error("NOT_FOUND", "System not found", 404);
+    }
+  }
+
   const updated = await prisma.credential.update({
     where: { id: params.id },
     data: {
@@ -105,8 +125,9 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   const session = await getServerSession(authOptions);
   if (!session) return error("UNAUTHORIZED", "Login required", 401);
 
+  const scope = await getActiveScope(session);
   const existing = await prisma.credential.findFirst({
-    where: { id: params.id, ...credentialWhereForSession(session) }
+    where: { id: params.id, ...credentialWhereForScope(session, scope) }
   });
   if (!existing) return error("NOT_FOUND", "Credential not found", 404);
 

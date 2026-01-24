@@ -7,6 +7,8 @@ import { prisma } from "@/lib/prisma";
 import { generatePassword } from "@/lib/password";
 import { encryptSecret, hashSecret } from "@/lib/crypto";
 import { writeAuditLog } from "@/lib/audit";
+import { getActiveScope } from "@/lib/scope";
+import { systemWhereForScope } from "@/lib/permissions";
 
 export async function createCredential(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -19,6 +21,15 @@ export async function createCredential(formData: FormData) {
 
   if (!systemId || !label || !expiresAt) {
     throw new Error("Missing required fields");
+  }
+
+  const scope = await getActiveScope(session);
+  const system = await prisma.system.findFirst({
+    where: { id: systemId, ...systemWhereForScope(session, scope) }
+  });
+
+  if (!system) {
+    throw new Error("System not found");
   }
 
   const secret = generatePassword({ length, minClasses: 4, requireSymbol: true, maxConsecutive: 2 });

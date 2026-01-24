@@ -539,6 +539,9 @@ video {
 .grid {
   display: grid;
 }
+.hidden {
+  display: none;
+}
 .h-10 {
   height: 2.5rem;
 }
@@ -548,23 +551,11 @@ video {
 .h-44 {
   height: 11rem;
 }
-.h-12 {
-  height: 3rem;
-}
-.h-16 {
-  height: 4rem;
-}
-.h-24 {
-  height: 6rem;
-}
 .min-h-\[90px\] {
   min-height: 90px;
 }
 .min-h-screen {
   min-height: 100vh;
-}
-.w-10 {
-  width: 2.5rem;
 }
 .w-40 {
   width: 10rem;
@@ -574,15 +565,6 @@ video {
 }
 .w-auto {
   width: auto;
-}
-.w-12 {
-  width: 3rem;
-}
-.w-16 {
-  width: 4rem;
-}
-.w-24 {
-  width: 6rem;
 }
 .max-w-2xl {
   max-width: 42rem;
@@ -595,6 +577,9 @@ video {
 }
 .max-w-xl {
   max-width: 36rem;
+}
+.flex-1 {
+  flex: 1 1 0%;
 }
 .shrink-0 {
   flex-shrink: 0;
@@ -674,6 +659,10 @@ video {
 }
 .border-white\/20 {
   border-color: rgb(255 255 255 / 0.2);
+}
+.border-neon-blue {
+  --tw-border-opacity: 1;
+  border-color: rgb(121 213 255 / var(--tw-border-opacity, 1));
 }
 .bg-amber-400\/10 {
   background-color: rgb(251 191 36 / 0.1);
@@ -838,16 +827,8 @@ video {
 .outline {
   outline-style: solid;
 }
-.drop-shadow-\[0_0_10px_rgba\(76\2c 195\2c 255\2c 0\.6\)\] {
-  --tw-drop-shadow: drop-shadow(0 0 10px rgba(76,195,255,0.6));
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
-}
 .drop-shadow-\[0_0_12px_rgba\(125\2c 231\2c 255\2c 0\.65\)\] {
   --tw-drop-shadow: drop-shadow(0 0 12px rgba(125,231,255,0.65));
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
-}
-.drop-shadow-\[0_0_12px_rgba\(76\2c 195\2c 255\2c 0\.6\)\] {
-  --tw-drop-shadow: drop-shadow(0 0 12px rgba(76,195,255,0.6));
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 .drop-shadow-\[0_0_16px_rgba\(76\2c 195\2c 255\2c 0\.6\)\] {
@@ -1023,6 +1004,10 @@ body {
 
   .md\:flex-row {
     flex-direction: row;
+  }
+
+  .md\:items-end {
+    align-items: flex-end;
   }
 
   .md\:items-center {
