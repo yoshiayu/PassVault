@@ -1,3 +1,6 @@
+<img width="1466" height="720" alt="スクリーンショット 2026-01-26 11 14 27" src="https://github.com/user-attachments/assets/f6aa41c4-05d3-4ef5-9232-1e6856a4286a" />
+
+
 # PassVault QR
 
 パスワードの生成・期限管理・QR引き渡しを標準化する社内向け運用アプリです。  
