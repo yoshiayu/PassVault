@@ -5,10 +5,13 @@ import { prisma } from "@/lib/prisma";
 
 function isAllowedDomain(email: string | null | undefined): boolean {
   if (!email) return false;
-  const allowed = (process.env.ALLOWED_EMAIL_DOMAINS ?? "").split(",").map((d) => d.trim()).filter(Boolean);
+  const allowed = (process.env.ALLOWED_EMAIL_DOMAINS ?? "")
+    .split(",")
+    .map((d) => d.trim().toLowerCase())
+    .filter(Boolean);
   if (allowed.length === 0) return true;
-  const domain = email.split("@")[1] ?? "";
-  return allowed.includes(domain);
+  const domain = (email.split("@")[1] ?? "").toLowerCase();
+  return allowed.some((entry) => domain === entry || domain.endsWith(`.${entry}`));
 }
 
 export const authOptions: NextAuthOptions = {
@@ -16,7 +19,8 @@ export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? ""
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+      allowDangerousEmailAccountLinking: true
     })
   ],
   pages: {

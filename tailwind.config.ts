@@ -10,12 +10,12 @@ const config: Config = {
         "candy-blue": "#2ea3ff",
         "candy-blue-deep": "#0b5bff",
         "candy-blue-glow": "#7de7ff",
-        "glass-border": "rgba(255, 255, 255, 0.3)",
-        "glass-fill": "rgba(255, 255, 255, 0.08)"
+        "glass-border": "rgba(255, 255, 255, 0.45)",
+        "glass-fill": "rgba(255, 255, 255, 0.14)"
       },
       boxShadow: {
         glow:
-          "0 0 60px rgba(46, 163, 255, 0.55), 0 0 24px rgba(125, 231, 255, 0.6), 0 0 6px rgba(255, 255, 255, 0.7)",
+          "0 0 80px rgba(46, 163, 255, 0.7), 0 0 36px rgba(125, 231, 255, 0.75), 0 0 12px rgba(255, 255, 255, 0.85)",
         inset: "inset 0 0 0 1px rgba(255, 255, 255, 0.15)"
       },
       backdropBlur: {

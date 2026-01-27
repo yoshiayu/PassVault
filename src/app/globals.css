@@ -10,21 +10,23 @@ body {
   @apply min-h-screen bg-black text-white;
   font-family: "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
   background-image:
-    radial-gradient(circle at top left, rgba(46, 163, 255, 0.6), transparent 55%),
-    radial-gradient(circle at 20% 70%, rgba(125, 231, 255, 0.35), transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(11, 91, 255, 0.45), transparent 55%),
-    linear-gradient(120deg, #0a0f1d, #081024 40%, #04070f 100%);
+    radial-gradient(circle at top left, rgba(90, 198, 255, 0.85), transparent 55%),
+    radial-gradient(circle at 25% 70%, rgba(165, 245, 255, 0.55), transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(45, 132, 255, 0.65), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(46, 163, 255, 0.4), transparent 45%),
+    linear-gradient(120deg, #0b1224, #071733 40%, #030814 100%);
 }
 
 .glass-panel {
   @apply rounded-2xl border-2 border-glass-border bg-glass-fill shadow-glow backdrop-blur-glass;
   background-image:
-    linear-gradient(120deg, rgba(46, 163, 255, 0.12), rgba(11, 91, 255, 0.08)),
-    radial-gradient(circle at 20% 20%, rgba(125, 231, 255, 0.25), transparent 45%);
+    linear-gradient(120deg, rgba(90, 198, 255, 0.18), rgba(11, 91, 255, 0.14)),
+    radial-gradient(circle at 20% 20%, rgba(125, 231, 255, 0.35), transparent 45%),
+    radial-gradient(circle at 80% 0%, rgba(125, 231, 255, 0.25), transparent 40%);
   box-shadow:
-    0 0 0 1px rgba(46, 163, 255, 0.55),
-    0 0 54px rgba(46, 163, 255, 0.5),
-    0 0 16px rgba(125, 231, 255, 0.6);
+    0 0 0 2px rgba(125, 231, 255, 0.65),
+    0 0 80px rgba(46, 163, 255, 0.65),
+    0 0 24px rgba(125, 231, 255, 0.7);
 }
 
 .glass-chip {
@@ -33,4 +35,9 @@ body {
 
 .glass-field {
   @apply w-full rounded-xl border border-glass-border bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-neon-blue;
+}
+
+.text-neon-blue,
+.text-candy-blue-glow {
+  text-shadow: 0 0 12px rgba(125, 231, 255, 0.85), 0 0 28px rgba(46, 163, 255, 0.7);
 }

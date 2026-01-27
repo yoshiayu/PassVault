@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { useI18n } from "@/components/i18n-provider";
 
 type Credential = {
   id: string;
@@ -20,27 +21,28 @@ async function fetchCredentials(): Promise<Credential[]> {
 }
 
 export default function CredentialTable() {
+  const { t, locale } = useI18n();
   const { data, isLoading, error } = useQuery({
     queryKey: ["credentials"],
     queryFn: fetchCredentials
   });
 
   if (isLoading) {
-    return <p className="text-sm text-white/60">Loading credentials...</p>;
+    return <p className="text-sm text-white/60">{t("credentialTable.loading")}</p>;
   }
   if (error || !data) {
-    return <p className="text-sm text-red-200">Failed to load credentials.</p>;
+    return <p className="text-sm text-red-200">{t("credentialTable.error")}</p>;
   }
 
   return (
     <div className="glass-panel p-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">Credentials</h2>
+        <h2 className="text-lg font-semibold text-white">{t("credentialTable.title")}</h2>
         <Link
           href="/items"
           className="rounded-full border border-glass-border px-4 py-1 text-xs font-semibold text-neon-blue hover:border-neon-blue"
         >
-          View all
+          {t("credentialTable.viewAll")}
         </Link>
       </div>
       <div className="mt-4 grid gap-3">
@@ -51,9 +53,11 @@ export default function CredentialTable() {
               <p className="text-xs text-white/60">{item.system.name}</p>
             </div>
             <div className="flex items-center gap-3">
-              <p className="text-xs text-white/60">Expires {new Date(item.expiresAt).toLocaleDateString()}</p>
+              <p className="text-xs text-white/60">
+                {t("credentialTable.expires", { date: new Date(item.expiresAt).toLocaleDateString(locale) })}
+              </p>
               <Link className="text-xs text-neon-blue" href={`/items/${item.id}`}>
-                Details
+                {t("credentialTable.details")}
               </Link>
             </div>
           </div>

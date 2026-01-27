@@ -5,11 +5,15 @@ import { credentialWhereForScope } from "@/lib/permissions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CredentialTable from "@/components/credential-table";
 import { getActiveScope } from "@/lib/scope";
+import { createTranslator } from "@/lib/i18n/messages";
+import { getLocaleFromCookies } from "@/lib/i18n/server";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) return null;
 
+  const locale = getLocaleFromCookies();
+  const t = createTranslator(locale);
   const scope = await getActiveScope(session);
   const now = new Date();
   const soon = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
@@ -34,31 +38,31 @@ export default async function DashboardPage() {
       <section className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle>Expiring soon</CardTitle>
+            <CardTitle>{t("dashboard.expiringSoon")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold text-white">{expiringSoon}</p>
-            <p className="mt-2 text-xs text-white/60">Within 3 days</p>
+            <p className="mt-2 text-xs text-white/60">{t("dashboard.withinDays")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Expired</CardTitle>
+            <CardTitle>{t("dashboard.expired")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold text-white">{expired}</p>
-            <p className="mt-2 text-xs text-white/60">Remove or rotate ASAP</p>
+            <p className="mt-2 text-xs text-white/60">{t("dashboard.expiredHelp")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Next actions</CardTitle>
+            <CardTitle>{t("dashboard.nextActions")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-xs text-white/70">
-              <li>Generate new credentials for critical systems.</li>
-              <li>Review expired QR tokens.</li>
-              <li>Confirm deletion policy.</li>
+              <li>{t("dashboard.action.generate")}</li>
+              <li>{t("dashboard.action.review")}</li>
+              <li>{t("dashboard.action.confirmDelete")}</li>
             </ul>
           </CardContent>
         </Card>

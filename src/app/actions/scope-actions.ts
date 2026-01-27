@@ -70,3 +70,34 @@ export async function setActiveScope(formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath("/items");
 }
+
+export async function deleteOrganization(formData: FormData) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("Unauthorized");
+
+  const organizationId = String(formData.get("organizationId") ?? "").trim();
+  if (!organizationId) {
+    throw new Error("Organization id required");
+  }
+
+  const membership = await prisma.membership.findFirst({
+    where: { userId: session.user.id, organizationId, role: "OWNER" }
+  });
+
+  if (!membership) {
+    throw new Error("Forbidden");
+  }
+
+  await prisma.user.updateMany({
+    where: { activeOrganizationId: organizationId },
+    data: { activeOrganizationId: null }
+  });
+
+  await prisma.organization.delete({ where: { id: organizationId } });
+
+  await writeAuditLog({ userId: session.user.id, action: "DELETE", entityType: "Organization", entityId: organizationId });
+
+  revalidatePath("/settings");
+  revalidatePath("/dashboard");
+  revalidatePath("/items");
+}

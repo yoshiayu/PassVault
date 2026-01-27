@@ -10,6 +10,14 @@ export const organizationSchema = z.object({
   name: z.string().min(1).max(120)
 });
 
+export const organizationContactSchema = z.object({
+  kind: z.enum(["PERSON", "COMPANY"]),
+  name: z.string().max(120).optional().nullable(),
+  address: z.string().max(240).optional().nullable(),
+  phone: z.string().max(40).optional().nullable(),
+  email: z.string().email().max(120).optional().nullable()
+});
+
 export const credentialSchema = z.object({
   systemId: z.string().cuid(),
   label: z.string().min(1).max(120),

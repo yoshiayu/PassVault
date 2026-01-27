@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/components/i18n-provider";
 
 type System = { id: string; name: string };
 
@@ -27,6 +28,7 @@ type QrResponse = {
 };
 
 export default function QuickGenerate({ systems }: { systems: System[] }) {
+  const { t, locale } = useI18n();
   const [systemId, setSystemId] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
   const [label, setLabel] = useState("");
@@ -50,12 +52,12 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
 
   const generate = async () => {
     if (!systemId || !expiresAt) {
-      setError("システムと有効期限は必須です。");
+      setError(t("quickGenerate.error.systemRequired"));
       return;
     }
     const expiryIso = toEndOfDayIso(expiresAt);
     if (!expiryIso) {
-      setError("有効期限が不正です。");
+      setError(t("quickGenerate.error.expirationInvalid"));
       return;
     }
     setLoading(true);
@@ -66,14 +68,14 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemId,
-          label: "Unlabeled",
+          label: t("quickGenerate.unlabeled"),
           expiresAt: expiryIso,
           mode: "generate",
           length
         })
       });
       const body: GenerateResponse & { message?: string } = await res.json();
-      if (!res.ok) throw new Error(body.message ?? "生成に失敗しました。");
+      if (!res.ok) throw new Error(body.message ?? t("quickGenerate.error.generateFailed"));
 
       setCredentialId(body.data.id);
       setGeneratedSecret(body.data.generatedSecret ?? null);
@@ -82,12 +84,12 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
 
       const qrRes = await fetch(`/api/credentials/${body.data.id}/qr`, { method: "POST" });
       const qrBody: QrResponse & { message?: string } = await qrRes.json();
-      if (!qrRes.ok) throw new Error(qrBody.message ?? "QRコードを生成できませんでした。");
+      if (!qrRes.ok) throw new Error(qrBody.message ?? t("quickGenerate.error.qrFailed"));
       setQrUrl(qrBody.data.dataUrl);
       setQrExpires(qrBody.data.expiresAt);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "生成に失敗しました。");
+      setError(err instanceof Error ? err.message : t("quickGenerate.error.generateFailed"));
     } finally {
       setLoading(false);
     }
@@ -103,11 +105,11 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ label: label.trim() })
       });
-      if (!res.ok) throw new Error("ラベル保存に失敗しました。");
+      if (!res.ok) throw new Error(t("quickGenerate.error.saveLabelFailed"));
       setLabelSaved(true);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "ラベル保存に失敗しました。");
+      setError(err instanceof Error ? err.message : t("quickGenerate.error.saveLabelFailed"));
     } finally {
       setSaving(false);
     }
@@ -115,13 +117,13 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
 
   return (
     <section className="glass-panel p-6">
-      <h1 className="text-2xl font-semibold text-white">クイック生成</h1>
+      <h1 className="text-2xl font-semibold text-white">{t("quickGenerate.title")}</h1>
       <p className="mt-2 text-sm text-white/70">
-        1) 生成 2) QR発行 3) ラベル付け 4) 後で編集
+        {t("quickGenerate.subtitle")}
       </p>
       <div className="mt-4 grid gap-4 md:grid-cols-3">
         <label className="flex flex-col gap-2 text-xs text-white/60">
-          システム
+          {t("quickGenerate.system")}
           <select
             className="glass-field"
             value={systemId}
@@ -129,7 +131,7 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
             disabled={systems.length === 0}
           >
             <option value="" disabled>
-              {systems.length === 0 ? "システム未登録" : "システムを選択"}
+              {systems.length === 0 ? t("quickGenerate.systemNone") : t("quickGenerate.systemSelect")}
             </option>
             {systems.map((system) => (
               <option key={system.id} value={system.id} className="text-black">
@@ -139,15 +141,15 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
           </select>
         </label>
         <label className="flex flex-col gap-2 text-xs text-white/60">
-          有効期限
+          {t("quickGenerate.expirationDate")}
           <Input type="date" value={expiresAt} onChange={(event) => setExpiresAt(event.target.value)} />
         </label>
         <label className="flex flex-col gap-2 text-xs text-white/60">
-          ラベル
-          <Input value={label} onChange={(event) => setLabel(event.target.value)} placeholder="生成後" />
+          {t("quickGenerate.label")}
+          <Input value={label} onChange={(event) => setLabel(event.target.value)} placeholder={t("quickGenerate.labelPlaceholder")} />
         </label>
         <label className="flex flex-col gap-2 text-xs text-white/60">
-          文字数
+          {t("quickGenerate.length")}
           <select
             className="glass-field"
             value={String(length)}
@@ -167,7 +169,7 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
             className="rounded-full border border-glass-border bg-white/10 px-6 py-2 text-sm font-semibold text-white shadow-glow transition hover:bg-white/20"
             disabled={loading || systems.length === 0}
           >
-            {loading ? "生成中..." : "生成とQR"}
+            {loading ? t("quickGenerate.generating") : t("quickGenerate.generate")}
           </button>
           <button
             type="button"
@@ -175,7 +177,7 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
             className="rounded-full border border-glass-border px-6 py-2 text-sm font-semibold text-neon-blue transition hover:border-neon-blue"
             disabled={saving || !credentialId}
           >
-            {saving ? "保存中..." : "ラベルを保存"}
+            {saving ? t("quickGenerate.saving") : t("quickGenerate.saveLabel")}
           </button>
           <button
             type="button"
@@ -183,20 +185,20 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
             className="rounded-full border border-glass-border px-6 py-2 text-sm font-semibold text-white/80 transition hover:border-neon-blue"
             disabled={!labelSaved || !generatedSecret}
           >
-            パス解除で表示
+            {t("quickGenerate.revealAfter")}
           </button>
         </div>
       </div>
       {generatedSecret ? (
         <div className="mt-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80">
-          <p className="text-xs text-white/60">パスワード</p>
+          <p className="text-xs text-white/60">{t("quickGenerate.password")}</p>
           <p className="mt-1 font-mono tracking-wider">{revealed ? generatedSecret : "••••••••••••"}</p>
-          {!labelSaved ? <p className="mt-2 text-xs text-amber-200">ラベル保存後に表示できます。</p> : null}
+          {!labelSaved ? <p className="mt-2 text-xs text-amber-200">{t("quickGenerate.visibleAfterLabel")}</p> : null}
         </div>
       ) : null}
       {systems.length === 0 ? (
         <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-xs text-amber-100">
-          システムが未登録です。先に /settings で登録してください。
+          {t("quickGenerate.noSystems")}
         </div>
       ) : null}
       {error ? (
@@ -207,7 +209,9 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
       {qrUrl ? (
         <div className="mt-6 flex flex-col gap-3">
           <img src={qrUrl} alt="QR" className="h-44 w-44 rounded-xl border border-white/20" />
-          <p className="text-xs text-white/60">QR有効期限 {new Date(qrExpires ?? "").toLocaleString()}</p>
+          <p className="text-xs text-white/60">
+            {t("quickGenerate.qrExpires", { date: new Date(qrExpires ?? "").toLocaleString(locale) })}
+          </p>
         </div>
       ) : null}
     </section>

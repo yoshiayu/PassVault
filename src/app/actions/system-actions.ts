@@ -42,3 +42,34 @@ export async function createSystem(formData: FormData) {
 
   revalidatePath("/settings");
 }
+
+export async function deleteSystem(formData: FormData) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("Unauthorized");
+
+  const systemId = String(formData.get("systemId") ?? "").trim();
+  if (!systemId) {
+    throw new Error("System id required");
+  }
+
+  const scope = await getActiveScope(session);
+
+  const result = await prisma.system.deleteMany({
+    where: {
+      id: systemId,
+      ownerId: session.user.id,
+      scopeType: scope.type === "organization" ? "ORGANIZATION" : "PERSONAL",
+      organizationId: scope.type === "organization" ? scope.organizationId : null
+    }
+  });
+
+  if (result.count === 0) {
+    throw new Error("System not found");
+  }
+
+  await writeAuditLog({ userId: session.user.id, action: "DELETE", entityType: "System", entityId: systemId });
+
+  revalidatePath("/settings");
+  revalidatePath("/items");
+  revalidatePath("/dashboard");
+}
