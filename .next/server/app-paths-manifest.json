@@ -1,7 +1,10 @@
 {
   "/(public)/page": "app/(public)/page.js",
-  "/(public)/signin/page": "app/(public)/signin/page.js",
+  "/api/credentials/[id]/route": "app/api/credentials/[id]/route.js",
+  "/api/credentials/route": "app/api/credentials/route.js",
+  "/api/credentials/[id]/qr/route": "app/api/credentials/[id]/qr/route.js",
   "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js",
+  "/(protected)/items/page": "app/(protected)/items/page.js",
   "/(protected)/settings/page": "app/(protected)/settings/page.js",
-  "/(protected)/items/page": "app/(protected)/items/page.js"
+  "/(protected)/items/[id]/page": "app/(protected)/items/[id]/page.js"
 }

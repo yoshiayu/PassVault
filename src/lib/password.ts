@@ -13,6 +13,8 @@ export type PasswordPolicy = {
   maxConsecutive?: number;
 };
 
+export type PasswordPreset = "alpha" | "alnum" | "full";
+
 function randomChar(set: string): string {
   return set[Math.floor(Math.random() * set.length)] ?? "";
 }
@@ -69,4 +71,40 @@ export function generatePassword(policy: PasswordPolicy): string {
   }
 
   throw new Error("Failed to generate password with the requested policy");
+}
+
+export function policyFromPreset(preset: PasswordPreset, length: number): PasswordPolicy {
+  switch (preset) {
+    case "alpha":
+      return {
+        length,
+        requireUpper: true,
+        requireLower: true,
+        requireDigit: false,
+        requireSymbol: false,
+        minClasses: 2,
+        maxConsecutive: 2
+      };
+    case "alnum":
+      return {
+        length,
+        requireUpper: true,
+        requireLower: true,
+        requireDigit: true,
+        requireSymbol: false,
+        minClasses: 3,
+        maxConsecutive: 2
+      };
+    case "full":
+    default:
+      return {
+        length,
+        requireUpper: true,
+        requireLower: true,
+        requireDigit: true,
+        requireSymbol: true,
+        minClasses: 4,
+        maxConsecutive: 2
+      };
+  }
 }

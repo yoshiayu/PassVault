@@ -26,6 +26,7 @@ export const credentialSchema = z.object({
   expiresAt: z.string().datetime(),
   mode: z.enum(["generate", "manual"]).default("generate"),
   length: z.number().min(6).max(15).optional(),
+  passwordPolicy: z.enum(["alpha", "alnum", "full"]).optional().default("full"),
   secret: z.string().min(6).max(200).optional()
 });
 
@@ -43,7 +44,8 @@ export const batchSchema = z.object({
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
   expiresInDays: z.number().min(1).max(30).optional(),
-  length: z.number().min(6).max(15).optional()
+  length: z.number().min(6).max(15).optional(),
+  passwordPolicy: z.enum(["alpha", "alnum", "full"]).optional().default("full")
 });
 
 export const resolveQrSchema = z.object({

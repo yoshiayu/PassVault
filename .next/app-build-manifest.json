@@ -26,15 +26,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(public)/signin/page.js"
     ],
+    "/(protected)/items/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(protected)/items/page.js"
+    ],
     "/(protected)/settings/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(protected)/settings/page.js"
     ],
-    "/(protected)/items/page": [
+    "/(protected)/items/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(protected)/items/page.js"
+      "static/chunks/app/(protected)/items/[id]/page.js"
     ]
   }
 }

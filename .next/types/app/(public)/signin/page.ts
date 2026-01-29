@@ -1,4 +1,4 @@
-// File: /Users/yoshiayu/Desktop/PassVault/src/app/(public)/signin/page.tsx
+// File: /Users/ayumuyoshinaga/Desktop/pass/PassVault/src/app/(public)/signin/page.tsx
 import * as entry from '../../../../../src/app/(public)/signin/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

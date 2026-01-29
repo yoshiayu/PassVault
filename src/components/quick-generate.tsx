@@ -33,6 +33,7 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
   const [expiresAt, setExpiresAt] = useState("");
   const [label, setLabel] = useState("");
   const [length, setLength] = useState(12);
+  const [passwordPolicy, setPasswordPolicy] = useState<"alpha" | "alnum" | "full">("full");
   const [credentialId, setCredentialId] = useState<string | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [qrExpires, setQrExpires] = useState<string | null>(null);
@@ -48,6 +49,17 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
     if (Number.isNaN(date.getTime())) return null;
     date.setHours(23, 59, 59, 999);
     return date.toISOString();
+  };
+
+  const readJsonSafe = async <T,>(res: Response): Promise<T | null> => {
+    const contentType = res.headers.get("content-type") ?? "";
+    const text = await res.text();
+    if (!text || !contentType.includes("application/json")) return null;
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      return null;
+    }
   };
 
   const generate = async () => {
@@ -71,11 +83,17 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
           label: t("quickGenerate.unlabeled"),
           expiresAt: expiryIso,
           mode: "generate",
-          length
+          length,
+          passwordPolicy
         })
       });
-      const body: GenerateResponse & { message?: string } = await res.json();
-      if (!res.ok) throw new Error(body.message ?? t("quickGenerate.error.generateFailed"));
+      const body = await readJsonSafe<GenerateResponse & { message?: string }>(res);
+      if (!res.ok) {
+        throw new Error(body?.message ?? `HTTP ${res.status}`);
+      }
+      if (!body?.data?.id) {
+        throw new Error(t("quickGenerate.error.generateFailed"));
+      }
 
       setCredentialId(body.data.id);
       setGeneratedSecret(body.data.generatedSecret ?? null);
@@ -83,8 +101,13 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
       setRevealed(false);
 
       const qrRes = await fetch(`/api/credentials/${body.data.id}/qr`, { method: "POST" });
-      const qrBody: QrResponse & { message?: string } = await qrRes.json();
-      if (!qrRes.ok) throw new Error(qrBody.message ?? t("quickGenerate.error.qrFailed"));
+      const qrBody = await readJsonSafe<QrResponse & { message?: string }>(qrRes);
+      if (!qrRes.ok) {
+        throw new Error(qrBody?.message ?? `HTTP ${qrRes.status}`);
+      }
+      if (!qrBody?.data?.dataUrl) {
+        throw new Error(t("quickGenerate.error.qrFailed"));
+      }
       setQrUrl(qrBody.data.dataUrl);
       setQrExpires(qrBody.data.expiresAt);
       setError(null);
@@ -160,6 +183,24 @@ export default function QuickGenerate({ systems }: { systems: System[] }) {
                 {len}
               </option>
             ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-2 text-xs text-white/60">
+          {t("quickGenerate.policy")}
+          <select
+            className="glass-field"
+            value={passwordPolicy}
+            onChange={(event) => setPasswordPolicy(event.target.value as "alpha" | "alnum" | "full")}
+          >
+            <option value="alpha" className="text-black">
+              {t("quickGenerate.policyAlpha")}
+            </option>
+            <option value="alnum" className="text-black">
+              {t("quickGenerate.policyAlnum")}
+            </option>
+            <option value="full" className="text-black">
+              {t("quickGenerate.policyFull")}
+            </option>
           </select>
         </label>
         <div className="md:col-span-3 flex flex-wrap gap-3">

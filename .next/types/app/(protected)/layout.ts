@@ -1,4 +1,4 @@
-// File: /Users/yoshiayu/Desktop/PassVault/src/app/(protected)/layout.tsx
+// File: /Users/ayumuyoshinaga/Desktop/pass/PassVault/src/app/(protected)/layout.tsx
 import * as entry from '../../../../src/app/(protected)/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -1,4 +1,4 @@
-// File: /Users/yoshiayu/Desktop/PassVault/src/app/api/credentials/route.ts
+// File: /Users/ayumuyoshinaga/Desktop/pass/PassVault/src/app/api/credentials/route.ts
 import * as entry from '../../../../../src/app/api/credentials/route.js'
 import type { NextRequest } from 'next/server.js'
 

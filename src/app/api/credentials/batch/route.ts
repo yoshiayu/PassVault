@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { batchSchema } from "@/lib/validators";
 import { error, ok } from "@/lib/api-response";
-import { generatePassword } from "@/lib/password";
+import { generatePassword, policyFromPreset } from "@/lib/password";
 import { encryptSecret, hashSecret } from "@/lib/crypto";
 import { writeAuditLog } from "@/lib/audit";
 import { getActiveScope } from "@/lib/scope";
@@ -41,10 +41,7 @@ export async function POST(request: NextRequest) {
   const results = await prisma.$transaction(
     days.map((day) => {
       const secret = generatePassword({
-        length: parsed.data.length ?? 12,
-        minClasses: 4,
-        requireSymbol: true,
-        maxConsecutive: 2
+        ...policyFromPreset(parsed.data.passwordPolicy ?? "full", parsed.data.length ?? 12)
       });
       return prisma.credential.create({
         data: {
